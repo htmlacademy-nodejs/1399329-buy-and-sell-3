@@ -1,5 +1,6 @@
 'use strict';
 
+const log = require(`./console`);
 const {HELP, VERSION, GENERATE} = require(`../../constants`).COMMANDS;
 
 const helperText = `
@@ -14,6 +15,6 @@ const helperText = `
 module.exports = {
   name: HELP,
   run() {
-    console.info(helperText);
+    log.info(helperText);
   }
 };
