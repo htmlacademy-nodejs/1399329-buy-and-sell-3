@@ -51,6 +51,7 @@ const writeContentToFile = async (fileName, content) => {
     log.success(`Operation success. File created.`);
   } catch (error) {
     log.error(`Can't write data to file...`);
+    process.exit(ExitCode.error);
   }
 };
 
