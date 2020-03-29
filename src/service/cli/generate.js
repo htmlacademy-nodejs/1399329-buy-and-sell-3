@@ -14,9 +14,10 @@ const {
   PictureRestrict
 } = require(`../../constants/generate`);
 
-const FILE_SENTENCES_PATH = path.resolve(__dirname, `../../data/sentences.txt`);
-const FILE_TITLES_PATH = path.resolve(__dirname, `../../data/titles.txt`);
-const FILE_CATEGORIES_PATH = path.resolve(__dirname, `../../data/categories.txt`);
+const rootPath = process.cwd();
+const FILE_SENTENCES_PATH = path.resolve(rootPath, `./data/sentences.txt`);
+const FILE_TITLES_PATH = path.resolve(rootPath, `./data/titles.txt`);
+const FILE_CATEGORIES_PATH = path.resolve(rootPath, `./data/categories.txt`);
 
 const {validateGenerateOffers} = require(`./validation`);
 
@@ -38,17 +39,27 @@ const getCategory = (categories) => shuffle(categories).slice(getRandomInt(0, ca
 const readContent = async (pathname) => {
   try {
     const content = await fs.readFile(pathname, `utf8`);
-    return content.split(`\n`);
+    return content.split(`\n`).filter(Boolean);
   } catch (error) {
     log.error(error);
     return [];
   }
 };
 
-const generateOffers = async (count) => {
+const getContentFiles = async () => {
   const titles = await readContent(FILE_TITLES_PATH);
   const categories = await readContent(FILE_CATEGORIES_PATH);
   const sentences = await readContent(FILE_SENTENCES_PATH);
+
+  return {
+    titles,
+    categories,
+    sentences
+  };
+};
+
+const generateOffers = async (count) => {
+  const {titles, categories, sentences} = await getContentFiles();
 
   return Array(count).fill({}).map(() => ({
     title: getTitle(titles),
