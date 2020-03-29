@@ -1,6 +1,7 @@
 'use strict';
 
 const fs = require(`fs`).promises;
+const path = require(`path`);
 const log = require(`./console`);
 const {getRandomInt, shuffle, toJSON} = require(`./utils`);
 const {ExitCode, COMMANDS} = require(`../../constants`);
@@ -12,11 +13,12 @@ const {
   SumRestrict,
   PictureRestrict
 } = require(`../../constants/generate`);
-const {
-  TITLES,
-  SENTENCES,
-  CATEGORIES,
-} = require(`../../constants/lists`);
+
+const rootPath = process.cwd();
+const FILE_SENTENCES_PATH = path.resolve(rootPath, `./data/sentences.txt`);
+const FILE_TITLES_PATH = path.resolve(rootPath, `./data/titles.txt`);
+const FILE_CATEGORIES_PATH = path.resolve(rootPath, `./data/categories.txt`);
+
 const {validateGenerateOffers} = require(`./validation`);
 
 const {GENERATE} = COMMANDS;
@@ -34,14 +36,38 @@ const getType = (types) => {
 
 const getCategory = (categories) => shuffle(categories).slice(getRandomInt(0, categories.length - 1));
 
-const generateOffers = (count) => {
+const readContent = async (pathname) => {
+  try {
+    const content = await fs.readFile(pathname, `utf8`);
+    return content.split(`\n`).filter(Boolean);
+  } catch (error) {
+    log.error(error);
+    return [];
+  }
+};
+
+const getContentFiles = async () => {
+  const titles = await readContent(FILE_TITLES_PATH);
+  const categories = await readContent(FILE_CATEGORIES_PATH);
+  const sentences = await readContent(FILE_SENTENCES_PATH);
+
+  return {
+    titles,
+    categories,
+    sentences
+  };
+};
+
+const generateOffers = async (count) => {
+  const {titles, categories, sentences} = await getContentFiles();
+
   return Array(count).fill({}).map(() => ({
-    title: getTitle(TITLES),
+    title: getTitle(titles),
     picture: getPictureFileName(PictureRestrict),
-    description: getDescription(SENTENCES, MAX_DESCRIPTION_COUNT),
+    description: getDescription(sentences, MAX_DESCRIPTION_COUNT),
     type: getType(OfferType),
     sum: getRandomInt(SumRestrict.min, SumRestrict.max),
-    category: getCategory(CATEGORIES)
+    category: getCategory(categories)
   }));
 };
 
@@ -57,7 +83,7 @@ const writeContentToFile = async (fileName, content) => {
 
 module.exports = {
   name: GENERATE,
-  run(args) {
+  async run(args) {
     const [count] = args;
     const countOffer = Number.parseInt(count, 10) || DEFAULT_COUNT;
     const isValidOffers = validateGenerateOffers(countOffer);
@@ -66,7 +92,7 @@ module.exports = {
       process.exit(ExitCode.error);
     }
 
-    const content = toJSON(generateOffers(countOffer), {});
-    writeContentToFile(FILE_NAME, content);
+    const content = toJSON(await generateOffers(countOffer), {});
+    await writeContentToFile(FILE_NAME, content);
   }
 };
