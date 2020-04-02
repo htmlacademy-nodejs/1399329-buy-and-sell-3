@@ -39,7 +39,7 @@ const getCategory = (categories) => shuffle(categories).slice(getRandomInt(0, ca
 const readContent = async (pathname) => {
   try {
     const content = await fs.readFile(pathname, `utf8`);
-    return content.split(`\n`).filter(Boolean);
+    return content.split(`\n`).filter(Boolean).map((string) => string.trim());
   } catch (error) {
     log.error(error);
     return [];
