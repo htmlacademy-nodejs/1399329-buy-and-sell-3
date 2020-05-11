@@ -5,8 +5,8 @@ const log = require(`../cli/console`);
 
 const INTERNAL_SERVER_MSG_TEXT = `Something went wrong`;
 
-const errorHandler = (err, _, res) => {
-  log.error(err);
+const errorHandler = (err, req, res, next) => {
+  log.error(err, err.stack);
   res.status(HttpCode.INTERNAL_SERVER_ERROR).send(INTERNAL_SERVER_MSG_TEXT);
 };
 
