@@ -6,7 +6,7 @@ const path = require(`path`);
 
 const {HttpCode} = require(`../../constants`);
 
-const OffersRouter = new express.Router();
+const offersRouter = new express.Router();
 
 const FILE_MOCKS_PATH = path.resolve(process.cwd(), `mocks.json`);
 
@@ -19,7 +19,7 @@ const readFileContent = async (pathname) => {
   }
 };
 
-OffersRouter.get(`/`, async (_, res, next) => {
+offersRouter.get(`/`, async (_, res, next) => {
   try {
     const mocks = await readFileContent(FILE_MOCKS_PATH);
     res.status(HttpCode.OK).json(mocks);
@@ -28,4 +28,4 @@ OffersRouter.get(`/`, async (_, res, next) => {
   }
 });
 
-module.exports = OffersRouter;
+module.exports = offersRouter;

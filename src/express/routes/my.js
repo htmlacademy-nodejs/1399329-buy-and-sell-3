@@ -1,9 +1,9 @@
 'use strict';
 
 const express = require(`express`);
-const MyRoutes = new express.Router();
+const myRoutes = new express.Router();
 
-MyRoutes.get(`/`, (_, res) => res.render(`tickets/my-tickets`));
-MyRoutes.get(`/comments`, (_, res) => res.render(`comments/comments`));
+myRoutes.get(`/`, (_, res) => res.render(`tickets/my-tickets`));
+myRoutes.get(`/comments`, (_, res) => res.render(`comments/comments`));
 
-module.exports = MyRoutes;
+module.exports = myRoutes;

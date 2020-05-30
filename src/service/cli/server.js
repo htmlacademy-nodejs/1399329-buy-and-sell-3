@@ -2,7 +2,7 @@
 
 const express = require(`express`);
 const log = require(`./console`);
-const OffersRouter = require(`../routes/offers`);
+const offersRouter = require(`../routes/offers`);
 
 const notFoundHandler = require(`../handlers/notFoundHandler`);
 const errorHandler = require(`../handlers/errorHandler`);
@@ -14,7 +14,7 @@ const DEFAULT_PORT = 3000;
 const app = express();
 app.use(express.json());
 
-app.use(`/offers`, OffersRouter);
+app.use(`/offers`, offersRouter);
 
 app.use(notFoundHandler);
 app.use(errorHandler);
