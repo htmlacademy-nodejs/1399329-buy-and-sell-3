@@ -4,7 +4,7 @@ const express = require(`express`);
 const log = require(`./console`);
 const offersRouter = require(`../routes/offers`);
 
-const notFoundHandler = require(`../handlers/notFoundHandler`);
+const notFoundRouteHandler = require(`../handlers/notFoundRouteHandler`);
 const errorHandler = require(`../handlers/errorHandler`);
 
 const {COMMANDS} = require(`../../constants`);
@@ -16,7 +16,7 @@ app.use(express.json());
 
 app.use(`/offers`, offersRouter);
 
-app.use(notFoundHandler);
+app.use(notFoundRouteHandler);
 app.use(errorHandler);
 
 module.exports = {
