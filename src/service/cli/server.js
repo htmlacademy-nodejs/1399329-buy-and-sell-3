@@ -1,29 +1,40 @@
-'use strict';
+"use strict";
 
 const express = require(`express`);
 const log = require(`./console`);
 const offersRouter = require(`../routes/offers`);
+const createApi = require(`../api`);
 
-const notFoundRouteHandler = require(`../handlers/notFoundRouteHandler`);
-const errorHandler = require(`../handlers/errorHandler`);
+const notFoundRouteHandler = require(`../middlewares/notFoundRouteHandler`);
+const {customErrorHandler, errorHandler} = require(`../middlewares/errors`);
 
-const {COMMANDS} = require(`../../constants`);
+const {COMMANDS, API_PREFIX} = require(`../../constants`);
 
 const DEFAULT_PORT = 3000;
 
-const app = express();
-app.use(express.json());
+const createApp = async () => {
+  const app = express();
+  const apiRouter = await createApi();
 
-app.use(`/offers`, offersRouter);
+  app.use(express.json());
 
-app.use(notFoundRouteHandler);
-app.use(errorHandler);
+  app.use(`/offers`, offersRouter);
+  app.use(API_PREFIX, apiRouter);
+
+  app.use(notFoundRouteHandler);
+  app.use(customErrorHandler);
+  app.use(errorHandler);
+
+  return app;
+};
 
 module.exports = {
   name: COMMANDS.SERVER,
-  run(args) {
+  async run(args) {
     const [customPort] = args;
     const port = Number.parseInt(customPort, 10) || DEFAULT_PORT;
+
+    const app = await createApp();
 
     app
       .listen(port, () => log.success(`Ожидаю соединений на ${port}`))
