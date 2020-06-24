@@ -2,6 +2,7 @@
 
 const fs = require(`fs`).promises;
 const FILENAME = `mocks.json`;
+
 let data = null;
 
 const getMockData = async () => {
@@ -13,7 +14,7 @@ const getMockData = async () => {
     const fileContent = await fs.readFile(FILENAME);
     data = JSON.parse(fileContent);
   } catch (err) {
-    return Promise.reject(err);
+    return [];
   }
 
   return Promise.resolve(data);
