@@ -40,8 +40,10 @@ const {GENERATE} = COMMANDS;
 
 const getTitle = (titles) => titles[getRandomInt(0, titles.length - 1)];
 
-const getPictureFileName = (restrict) =>
-  `item${getRandomInt(restrict.min, restrict.max)}.jpg`;
+const getPictureFileName = (restrict) => {
+  const randomInt = getRandomInt(restrict.min, restrict.max);
+  return `item${randomInt > 9 ? randomInt : `0` + randomInt}.jpg`;
+};
 
 const getDescription = (descriptions, maxCount) =>
   shuffle(descriptions).slice(1, maxCount).join(` `);

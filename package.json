@@ -8,7 +8,7 @@
     "start::debug": "cross-env LOG_LEVEL=debug npm run start",
     "server": "cross-env NODE_ENV=error nodemon ./src/service/service.js --server",
     "server::debug": "cross-env NODE_ENV=debug nodemon ./src/service/service.js --server | ./node_modules/.bin/pino-pretty",
-    "start-front-server": "node ./src/express/index.js",
+    "start-front-server": "nodemon ./src/express/index.js",
     "eslint": "eslint --ext .js src/",
     "test": "npm run eslint && npm run test::rest",
     "test::rest": "cross-env NODE_ENV=test jest"
@@ -32,9 +32,11 @@
     "supertest": "^4.0.2"
   },
   "dependencies": {
+    "axios": "^0.19.2",
     "chalk": "^3.0.0",
     "cross-env": "7.0.2",
     "express": "4.17.1",
+    "multer": "^1.4.2",
     "nanoid": "3.1.9",
     "pino": "6.3.2",
     "pug": "2.0.4"

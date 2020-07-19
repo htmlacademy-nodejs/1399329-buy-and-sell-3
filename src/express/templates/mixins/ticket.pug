@@ -1,0 +1,22 @@
+mixin ticket({ mode = 'read', data = {}, count = 0 })
+  - var label = data.type === 'offer' ? 'Продам' : 'Куплю';
+  - var color = count > 9 ? count + 1 : '0' + (count + 1);
+
+  div(class='ticket-card ticket-card--color' + color)
+    .ticket-card__img
+      img(src='img/' + data.picture alt='Изображение товара')
+    .ticket-card__info
+      span.ticket-card__label #{label}
+      .ticket-card__categories
+        each cat in data.category
+          a(href='#') #{cat}
+      .ticket-card__header
+        h3.ticket-card__title
+          a(href='#') #{data.title}
+        p.ticket-card__price
+          span.js-sum #{data.sum}
+          |  ₽
+      .ticket-card__desc
+        p #{data.description}
+    if mode === 'edit'
+      button.ticket-card__del.js-delete(type='button') Удалить
