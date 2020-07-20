@@ -1,0 +1,25 @@
+mixin comment({ mode = 'read', data = {} })
+  - var label = data.type === 'offer' ? 'Продам' : 'Куплю';
+
+  .comments__block
+    .comments__header
+      a.announce-card(href='#')
+        h2.announce-card__title #{data.title}
+        span.announce-card__info
+          span.announce-card__price ₽ #{data.sum}
+          span.announce-card__type #{label}
+    ul.comments-list
+      each comment, index in data.comments
+        - var avatar = index > 9 ? index + 1 : '0' + (index + 1);
+
+        li.js-card
+          .comment-card
+            .comment-card__header
+              a.comment-card__avatar.avatar(href='#')
+                img(src='img/avatar' + avatar + '.jpg' srcset='img/avatar03@2x.jpg 2x' alt='Аватар пользователя')
+              p.comment-card__author Александр Бурый
+            .comment-card__content
+              p
+                | #{comment.text}
+            if mode === 'edit'
+              button.comment-card__delete.js-delete(type='button') Удалить
