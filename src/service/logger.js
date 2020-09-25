@@ -16,6 +16,9 @@ const logMessages = {
   getCustomError: (error) =>
     `Custom error. Status code: ${error.code}. Error message: ${error.msg}`,
   getUnknownError: (error) => `Unknown error. Error: ${error}`,
+  getStartConnectDB: () => `Starting to establish a connection to db server`,
+  getEndConnectDB: () => `Connection to db server is established`,
+  getErrorStartConnectDB: (error) => `DB server can't start. Error: ${error}`,
 };
 
 module.exports = {

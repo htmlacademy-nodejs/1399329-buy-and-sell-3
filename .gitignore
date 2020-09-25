@@ -16,3 +16,6 @@ build/
 
 # Генерируемый файл с данными для API
 mocks.json
+
+# Environment variables
+.env
