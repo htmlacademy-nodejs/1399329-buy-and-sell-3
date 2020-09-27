@@ -2,6 +2,7 @@
 
 const express = require(`express`);
 const createApi = require(`../api`);
+const {testConnectionDB} = require(`../db-service`);
 const {getLogger, logMessages} = require(`../logger`);
 
 const startRequestLogger = require(`../middlewares/startRequestLogger`);
@@ -15,6 +16,9 @@ const logger = getLogger();
 
 const createApp = async () => {
   const app = express();
+
+  await testConnectionDB();
+
   const apiRouter = await createApi();
 
   app.use(express.json());
