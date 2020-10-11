@@ -9,15 +9,24 @@ const startRequestLogger = require(`../middlewares/startRequestLogger`);
 const notFoundRouteHandler = require(`../middlewares/notFoundRouteHandler`);
 const {customErrorHandler, errorHandler} = require(`../middlewares/errors`);
 
-const {COMMANDS, API_PREFIX} = require(`../../constants`);
+const {COMMANDS, API_PREFIX, ExitCode} = require(`../../constants`);
 const DEFAULT_PORT = 3000;
 
 const logger = getLogger();
 
 const createApp = async () => {
   const app = express();
+  const {dataBaseLogger} = testConnectionDB;
 
-  await testConnectionDB();
+  try {
+    dataBaseLogger.start();
+
+    await testConnectionDB.run();
+    dataBaseLogger.end();
+  } catch (error) {
+    dataBaseLogger.error(error);
+    process.exit(ExitCode.error);
+  }
 
   const apiRouter = await createApi();
 

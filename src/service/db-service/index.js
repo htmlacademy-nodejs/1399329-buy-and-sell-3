@@ -2,7 +2,6 @@
 
 const Sequelize = require(`sequelize`);
 const {getLogger, logMessages} = require(`../logger`);
-const {ExitCode} = require(`../../constants`);
 const {db} = require(`../../../config`);
 
 const logger = getLogger({
@@ -16,16 +15,13 @@ const sequelize = new Sequelize(db.DB_NAME, db.DB_USER, db.DB_PASSWORD, {
   // logging: msg => logger.debug(msg) // add custom logger?
 });
 
-const testConnectionDB = async () => {
-  try {
-    logger.info(logMessages.getStartConnectDB());
-
-    await sequelize.authenticate();
-    logger.info(logMessages.getEndConnectDB());
-  } catch (error) {
-    logger.error(logMessages.getErrorStartConnectDB(error));
-    process.exit(ExitCode.error);
-  }
+const testConnectionDB = {
+  run: async () => sequelize.authenticate(),
+  dataBaseLogger: {
+    start: () => logger.info(logMessages.getStartConnectDB()),
+    end: () => logger.info(logMessages.getEndConnectDB()),
+    error: (...args) => logger.error(logMessages.getErrorStartConnectDB(...args)),
+  },
 };
 
 module.exports = {
