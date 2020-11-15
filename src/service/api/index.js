@@ -15,13 +15,13 @@ const {
   SearchService,
 } = require(`../data-service`);
 
-const createApi = async () => {
+const createApi = async (db) => {
   const apiRouter = new express.Router();
   const mockData = await getMockData();
 
-  category(apiRouter, new CategoryService(mockData));
-  offers(apiRouter, new OfferService(mockData), new CommentService());
-  search(apiRouter, new SearchService(mockData));
+  category(apiRouter, new CategoryService(db));
+  offers(apiRouter, new OfferService(db), new CommentService(db));
+  search(apiRouter, new SearchService(db));
 
   return apiRouter;
 };

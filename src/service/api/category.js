@@ -10,8 +10,8 @@ const logger = getLogger();
 module.exports = (apiRouter, service) => {
   apiRouter.use(`/categories`, categoryRouter);
 
-  categoryRouter.get(`/`, (req, res) => {
-    const categories = service.findAll();
+  categoryRouter.get(`/`, async (req, res) => {
+    const categories = await service.findAll();
 
     res.status(HttpCode.OK).json(categories);
     logger.info(logMessages.getEndRequest(req.originalUrl, res.statusCode));

@@ -1,6 +1,8 @@
 'use strict';
 
 const Sequelize = require(`sequelize`);
+const createModels = require('../models');
+const {categories, users, types} = require(`./mock`);
 const {getLogger, logMessages} = require(`../logger`);
 const {db} = require(`../../../config`);
 
@@ -24,6 +26,24 @@ const testConnectionDB = {
   },
 };
 
+const models = createModels(sequelize);
+
+const initDb = async () => {
+  await sequelize.sync({force: true});
+  console.info(`Структура БД успешно создана.`);
+
+  try {
+    await models.User.bulkCreate(users);
+    await models.Category.bulkCreate(categories);
+    await models.Type.bulkCreate(types);
+  } catch (error) {
+    console.log(`Catch bulkCreate`, error);
+  }
+};
+
 module.exports = {
+  sequelize,
   testConnectionDB,
+  db: models,
+  initDb,
 };
