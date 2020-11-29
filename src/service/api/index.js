@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 const express = require(`express`);
 
@@ -6,9 +6,8 @@ const category = require(`./category`);
 const offers = require(`./offers`);
 const search = require(`./search`);
 
-const getMockData = require(`../lib/getMockData`);
-
 const {
+  UserService,
   CategoryService,
   OfferService,
   CommentService,
@@ -17,11 +16,16 @@ const {
 
 const createApi = async (db) => {
   const apiRouter = new express.Router();
-  const mockData = await getMockData();
 
-  category(apiRouter, new CategoryService(db));
-  offers(apiRouter, new OfferService(db), new CommentService(db));
-  search(apiRouter, new SearchService(db));
+  const userService = new UserService(db.User);
+  const categoryService = new CategoryService(db.Category);
+  const offerService = new OfferService(db.Offer, categoryService, userService, db);
+  const commentService = new CommentService(db.Comment, userService);
+  const searchService = new SearchService(offerService);
+
+  category(apiRouter, categoryService);
+  offers(apiRouter, offerService, commentService);
+  search(apiRouter, searchService);
 
   return apiRouter;
 };

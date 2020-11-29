@@ -11,7 +11,7 @@ module.exports = (apiRouter, service) => {
   apiRouter.use(`/categories`, categoryRouter);
 
   categoryRouter.get(`/`, async (req, res) => {
-    const categories = await service.findAll();
+    const categories = await service.getAll();
 
     res.status(HttpCode.OK).json(categories);
     logger.info(logMessages.getEndRequest(req.originalUrl, res.statusCode));

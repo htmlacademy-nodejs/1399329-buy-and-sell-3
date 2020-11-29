@@ -3,13 +3,17 @@
 const {Op} = require(`sequelize`);
 
 class OfferService {
-  constructor(db) {
-    this._model = db.Offer;
+  constructor(model, categoryService, userService, db) {
+    this._model = model;
+
+    this._categoryService = categoryService;
+    this._userService = userService;
+
     this._db = db;
   }
 
   async getCategories(ids) {
-    const categories = await this._db.Category.findAll({
+    const categories = await this._categoryService.getAll({
       where: {
         id: {
           [Op.in]: ids,
@@ -25,14 +29,18 @@ class OfferService {
       Создание объявление должно быть прикреплено к user.
       На данный момент никакой информации о пользователе нет.
     */
-
-    const anonymous = await this._db.User.findByPk(1);
+    const anonymous = await this._userService.getById(1);
 
     const {type, category, ...other} = dataOffer;
     const createdOffer = {...other, typeId: type};
 
     const offer = await anonymous.createOffer(createdOffer);
     const categories = await this.getCategories(category);
+
+    console.log({
+      category,
+      categories,
+    });
 
     await offer.addCategories(categories);
 

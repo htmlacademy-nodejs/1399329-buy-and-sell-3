@@ -3,12 +3,12 @@
 const {Op} = require(`sequelize`);
 
 class SearchService {
-  constructor(db) {
-    this._db = db;
+  constructor(offerService) {
+    this._offerService = offerService;
   }
 
   async search(query) {
-    const foundOffers = await this._db.Offer.findAll({
+    const foundOffers = await this._offerService.getAll({
       where: {
         title: {
           [Op.iLike]: `%${query}%`,

@@ -1,12 +1,12 @@
 'use strict';
 
 class CategoryService {
-  constructor(db) {
-    this._model = db.Category;
+  constructor(model) {
+    this._model = model;
   }
 
-  async findAll() {
-    return await this._model.findAll({raw: true});
+  async getAll(options = {raw: true}) {
+    return await this._model.findAll(options);
   }
 }
 

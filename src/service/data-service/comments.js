@@ -3,9 +3,10 @@
 const {Op} = require(`sequelize`);
 
 class CommentService {
-  constructor(db) {
-    this._model = db.Comment;
-    this._db = db;
+  constructor(model, userService) {
+    this._model = model;
+
+    this._userService = userService;
   }
 
   async create(offer, dataComment) {
@@ -13,7 +14,7 @@ class CommentService {
       Создание комментария должно быть прикреплено к user.
       На данный момент никакой информации о пользователе нет.
     */
-    const anonymous = await this._db.User.findByPk(1);
+    const anonymous = await this._userService.getById(1);
 
     const createdComment = await anonymous.createComment({
       ...dataComment,
