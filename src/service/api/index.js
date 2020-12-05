@@ -19,7 +19,7 @@ const createApi = async (db) => {
 
   const userService = new UserService(db.User);
   const categoryService = new CategoryService(db.Category);
-  const offerService = new OfferService(db.Offer, categoryService, userService, db);
+  const offerService = new OfferService(db.Offer, categoryService, userService);
   const commentService = new CommentService(db.Comment, userService);
   const searchService = new SearchService(offerService);
 

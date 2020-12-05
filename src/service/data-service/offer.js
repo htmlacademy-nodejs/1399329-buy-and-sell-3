@@ -3,13 +3,11 @@
 const {Op} = require(`sequelize`);
 
 class OfferService {
-  constructor(model, categoryService, userService, db) {
+  constructor(model, categoryService, userService) {
     this._model = model;
 
     this._categoryService = categoryService;
     this._userService = userService;
-
-    this._db = db;
   }
 
   async getCategories(ids) {
