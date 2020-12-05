@@ -10,10 +10,11 @@ const logger = getLogger();
 module.exports = (apiRouter, service) => {
   apiRouter.use(`/search`, searchRouter);
 
-  searchRouter.get(`/`, (req, res) => {
+  searchRouter.get(`/`, async (req, res) => {
     const {query} = req.query;
+    const searchResult = await service.search(query);
 
-    res.status(HttpCode.OK).json(service.search(query));
+    res.status(HttpCode.OK).json(searchResult);
     logger.info(logMessages.getEndRequest(req.originalUrl, res.statusCode));
   });
 };

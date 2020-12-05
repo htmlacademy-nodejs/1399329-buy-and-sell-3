@@ -13,8 +13,10 @@ const logger = getLogger();
 module.exports = (apiRouter, service, commentService) => {
   apiRouter.use(`/offers`, offersRouter);
 
-  offersRouter.get(`/`, (req, res) => {
-    res.status(HttpCode.OK).json(service.getAll());
+  offersRouter.get(`/`, async (req, res) => {
+    const offers = await service.getAll();
+
+    res.status(HttpCode.OK).json(offers);
     logger.info(logMessages.getEndRequest(req.originalUrl, res.statusCode));
   });
 
@@ -25,46 +27,48 @@ module.exports = (apiRouter, service, commentService) => {
     logger.info(logMessages.getEndRequest(req.originalUrl, res.statusCode));
   });
 
-  offersRouter.post(`/`, offerValidator, (req, res) => {
-    res.status(HttpCode.CREATED).json(service.create(req.body));
+  offersRouter.post(`/`, offerValidator, async (req, res) => {
+    const createdOffer = await service.create(req.body);
+
+    res.status(HttpCode.CREATED).json(createdOffer);
     logger.info(logMessages.getEndRequest(req.originalUrl, res.statusCode));
   });
 
-  offersRouter.put(`/:offerId`, [offerValidator, findOffer(service)], (req, res) => {
-    const {offerId} = req.params;
+  offersRouter.put(`/:offerId`, [offerValidator, findOffer(service)], async (req, res) => {
     const {offer: oldOffer} = res.locals;
 
-    const updatedOffer = service.update(offerId, oldOffer, req.body);
+    const updatedOffer = await service.update(oldOffer, req.body);
 
     res.status(HttpCode.OK).json(updatedOffer);
     logger.info(logMessages.getEndRequest(req.originalUrl, res.statusCode));
   });
 
-  offersRouter.delete(`/:offerId`, findOffer(service), (req, res) => {
+  offersRouter.delete(`/:offerId`, findOffer(service), async (req, res) => {
     const {offerId} = req.params;
 
-    service.drop(offerId);
+    await service.drop(offerId);
     res.status(HttpCode.NO_CONTENT).send();
 
     logger.info(logMessages.getEndRequest(req.originalUrl, res.statusCode));
   });
 
-  offersRouter.get(`/:offerId/comments`, findOffer(service), (req, res) => {
+  offersRouter.get(`/:offerId/comments`, findOffer(service), async (req, res) => {
     const {offer} = res.locals;
-    const comments = commentService.getAll(offer);
+    const comments = await commentService.getAll(offer);
 
     res.status(HttpCode.OK).json(comments);
     logger.info(logMessages.getEndRequest(req.originalUrl, res.statusCode));
   });
 
-  offersRouter.post(`/:offerId/comments`, [commentValidator, findOffer(service)], (req, res) => {
+  offersRouter.post(`/:offerId/comments`, [commentValidator, findOffer(service)], async (req, res) => {
     const {offer} = res.locals;
+    const createdComment = await commentService.create(offer, req.body);
 
-    res.status(HttpCode.CREATED).json(commentService.create(offer, req.body));
+    res.status(HttpCode.CREATED).json(createdComment);
     logger.info(logMessages.getEndRequest(req.originalUrl, res.statusCode));
   });
 
-  offersRouter.delete(`/:offerId/comments/:commentId`, findOffer(service), (req, res) => {
+  offersRouter.delete(`/:offerId/comments/:commentId`, findOffer(service), async (req, res) => {
     const {commentId} = req.params;
     const {offer} = res.locals;
 

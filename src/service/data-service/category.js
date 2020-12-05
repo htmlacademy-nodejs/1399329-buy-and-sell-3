@@ -1,17 +1,12 @@
-"use strict";
+'use strict';
 
 class CategoryService {
-  constructor(offers) {
-    this._offers = offers;
+  constructor(model) {
+    this._model = model;
   }
 
-  findAll() {
-    const categories = this._offers.reduce((acc, offer) => {
-      acc.add(...offer.category);
-      return acc;
-    }, new Set());
-
-    return [...categories];
+  async getAll(options = {raw: true}) {
+    return await this._model.findAll(options);
   }
 }
 

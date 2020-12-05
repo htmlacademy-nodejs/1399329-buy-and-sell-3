@@ -1,8 +1,9 @@
 'use strict';
 
 const Sequelize = require(`sequelize`);
+const createModels = require('../models');
+const {categories, users, types} = require(`./mock`);
 const {getLogger, logMessages} = require(`../logger`);
-const {ExitCode} = require(`../../constants`);
 const {db} = require(`../../../config`);
 
 const logger = getLogger({
@@ -16,18 +17,33 @@ const sequelize = new Sequelize(db.DB_NAME, db.DB_USER, db.DB_PASSWORD, {
   // logging: msg => logger.debug(msg) // add custom logger?
 });
 
-const testConnectionDB = async () => {
-  try {
-    logger.info(logMessages.getStartConnectDB());
+const testConnectionDB = {
+  run: async () => sequelize.authenticate(),
+  dataBaseLogger: {
+    start: () => logger.info(logMessages.getStartConnectDB()),
+    end: () => logger.info(logMessages.getEndConnectDB()),
+    error: (...args) => logger.error(logMessages.getErrorStartConnectDB(...args)),
+  },
+};
 
-    await sequelize.authenticate();
-    logger.info(logMessages.getEndConnectDB());
+const models = createModels(sequelize);
+
+const initDb = async () => {
+  await sequelize.sync({force: true});
+  console.info(`Структура БД успешно создана.`);
+
+  try {
+    await models.User.bulkCreate(users);
+    await models.Category.bulkCreate(categories);
+    await models.Type.bulkCreate(types);
   } catch (error) {
-    logger.error(logMessages.getErrorStartConnectDB(error));
-    process.exit(ExitCode.error);
+    console.log(`Catch bulkCreate`, error);
   }
 };
 
 module.exports = {
+  sequelize,
   testConnectionDB,
+  db: models,
+  initDb,
 };

@@ -1,43 +1,91 @@
-"use strict";
+'use strict';
 
-const {nanoid} = require(`nanoid`);
-const {MAX_ID_LENGTH} = require(`../../constants/generate`);
-const {COMMENTS} = require(`../../constants/fields/offer`);
+const {Op} = require(`sequelize`);
 
 class OfferService {
-  constructor(offers) {
-    this._offers = offers;
+  constructor(model, categoryService, userService) {
+    this._model = model;
+
+    this._categoryService = categoryService;
+    this._userService = userService;
   }
 
-  create(offer) {
-    const createdOffer = {
-      id: nanoid(MAX_ID_LENGTH),
-      [COMMENTS]: [],
-      ...offer,
-    };
-    this._offers.push(createdOffer);
+  async getCategories(ids) {
+    const categories = await this._categoryService.getAll({
+      where: {
+        id: {
+          [Op.in]: ids,
+        },
+      },
+    });
 
-    return createdOffer;
+    return categories;
   }
 
-  drop(id) {
-    this._offers = this._offers.filter((item) => item.id !== id);
+  async create(dataOffer) {
+    /*
+      Создание объявление должно быть прикреплено к user.
+      На данный момент никакой информации о пользователе нет.
+    */
+    const anonymous = await this._userService.getById(1);
+
+    const {type, category, ...other} = dataOffer;
+    const createdOffer = {...other, typeId: type};
+
+    const offer = await anonymous.createOffer(createdOffer);
+    const categories = await this.getCategories(category);
+
+    console.log({
+      category,
+      categories,
+    });
+
+    await offer.addCategories(categories);
+
+    return offer.id;
   }
 
-  getAll() {
-    return this._offers;
+  async drop(id) {
+    await this._model.destroy({
+      where: {id},
+    });
   }
 
-  getById(id) {
-    return this._offers.find((item) => item.id === id);
+  async getAll() {
+    return await this._model.findAll({
+      include: [
+        {association: `type`, attributes: [`id`, `name`]},
+        {association: `categories`, attributes: [`id`, `name`], through: {attributes: []}},
+      ],
+    });
   }
 
-  update(id, oldOffer, newOffer) {
-    const index = this._offers.findIndex((item) => item.id === id);
-    const updatedOffer = {...oldOffer, ...newOffer};
+  async getById(id) {
+    return await this._model.findByPk(id, {
+      include: [
+        {
+          association: `user`,
+          attributes: [`name`, `surname`, `email`],
+        },
+        {association: `type`, attributes: [`id`, `name`]},
+        {association: `categories`, attributes: [`id`, `name`], through: {attributes: []}},
+      ],
+      // raw: true,
+      // Чтобы сохранить вложенность, иначе получается строка user.name
+      // nest: true,
+    });
+  }
 
-    this._offers[index] = updatedOffer;
-    return updatedOffer;
+  async update(oldOffer, newDataOffer) {
+    const {type, category, ...other} = newDataOffer;
+    const updatedOffer = {...other, typeId: type};
+
+    const offer = await oldOffer.update(updatedOffer);
+    const categories = await this.getCategories(category);
+
+    await offer.addCategories(categories);
+
+    return offer.id;
   }
 }
 

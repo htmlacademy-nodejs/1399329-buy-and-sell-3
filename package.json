@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node ./src/service/service.js",
     "start::debug": "cross-env LOG_LEVEL=debug npm run start",
+    "db::init": "node ./src/service/db-service/init.js",
     "server": "cross-env NODE_ENV=error nodemon ./src/service/service.js --server",
     "server::debug": "cross-env NODE_ENV=debug nodemon ./src/service/service.js --server | ./node_modules/.bin/pino-pretty",
     "start-front-server": "nodemon ./src/express/index.js",

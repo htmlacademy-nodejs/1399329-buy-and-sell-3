@@ -1,17 +1,22 @@
-"use strict";
+'use strict';
+
+const {Op} = require(`sequelize`);
 
 class SearchService {
-  constructor(offers) {
-    this._offers = offers;
+  constructor(offerService) {
+    this._offerService = offerService;
   }
 
-  search(query) {
-    const resultSearch = this._offers.filter((item) => {
-      const title = item.title.toLowerCase();
-      return title.includes(query.toLowerCase());
+  async search(query) {
+    const foundOffers = await this._offerService.getAll({
+      where: {
+        title: {
+          [Op.iLike]: `%${query}%`,
+        },
+      },
     });
 
-    return resultSearch;
+    return foundOffers;
   }
 }
 

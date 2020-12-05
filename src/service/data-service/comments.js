@@ -1,26 +1,43 @@
-"use strict";
+'use strict';
 
-const {nanoid} = require(`nanoid`);
-const {MAX_ID_LENGTH} = require(`../../constants/generate`);
+const {Op} = require(`sequelize`);
 
 class CommentService {
-  create(offer, comment) {
-    const createdComment = {
-      id: nanoid(MAX_ID_LENGTH),
-      ...comment,
-    };
+  constructor(model, userService) {
+    this._model = model;
 
-    offer.comments.push(createdComment);
-    return createdComment;
+    this._userService = userService;
   }
 
-  drop(offer, commentId) {
-    offer.comments = offer.comments.filter((item) => item.id !== commentId);
-    return;
+  async create(offer, dataComment) {
+    /*
+      Создание комментария должно быть прикреплено к user.
+      На данный момент никакой информации о пользователе нет.
+    */
+    const anonymous = await this._userService.getById(1);
+
+    const createdComment = await anonymous.createComment({
+      ...dataComment,
+      offerId: offer.id,
+    });
+
+    return createdComment.id;
   }
 
-  getAll(offer) {
-    return offer.comments;
+  async drop(offer, commentId) {
+    await this._model.destroy({
+      where: {
+        [Op.and]: [{offerId: offer.id}, {id: commentId}],
+      },
+    });
+  }
+
+  async getAll(offer) {
+    return await offer.getComments({
+      include: [
+        {association: `user`, attributes: [`name`, `surname`]},
+      ]
+    });
   }
 }
 

@@ -2,9 +2,9 @@
 
 const {HttpCode} = require(`../../constants`);
 
-module.exports = (service) => (req, res, next) => {
+module.exports = (service) => async (req, res, next) => {
   const {offerId} = req.params;
-  const offer = service.getById(offerId);
+  const offer = await service.getById(offerId);
 
   if (!offer) {
     return next({
