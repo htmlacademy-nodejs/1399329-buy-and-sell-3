@@ -35,11 +35,6 @@ class OfferService {
     const offer = await anonymous.createOffer(createdOffer);
     const categories = await this.getCategories(category);
 
-    console.log({
-      category,
-      categories,
-    });
-
     await offer.addCategories(categories);
 
     return offer.id;
@@ -57,6 +52,7 @@ class OfferService {
         {association: `type`, attributes: [`id`, `name`]},
         {association: `categories`, attributes: [`id`, `name`], through: {attributes: []}},
       ],
+      order: [['id', 'ASC']],
     });
   }
 
@@ -74,6 +70,21 @@ class OfferService {
       // Чтобы сохранить вложенность, иначе получается строка user.name
       // nest: true,
     });
+  }
+
+  async findPage({limit, offset}) {
+    const {count, rows} = await this._model.findAndCountAll({
+      limit,
+      offset,
+      include: [
+        {association: `type`, attributes: [`id`, `name`]},
+        {association: `categories`, attributes: [`id`, `name`], through: {attributes: []}},
+      ],
+      distinct: true,
+      order: [['id', 'ASC']],
+    });
+
+    return {count, offers: rows};
   }
 
   async update(oldOffer, newDataOffer) {
