@@ -14,7 +14,14 @@ module.exports = (apiRouter, service, commentService) => {
   apiRouter.use(`/offers`, offersRouter);
 
   offersRouter.get(`/`, async (req, res) => {
-    const offers = await service.getAll();
+    const {offset, limit} = req.query;
+    let offers;
+
+    if (offset || limit) {
+      offers = await service.findPage({offset, limit});
+    } else {
+      offers = await service.getAll();
+    }
 
     res.status(HttpCode.OK).json(offers);
     logger.info(logMessages.getEndRequest(req.originalUrl, res.statusCode));

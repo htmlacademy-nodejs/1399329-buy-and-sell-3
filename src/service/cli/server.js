@@ -2,7 +2,7 @@
 
 const express = require(`express`);
 const createApi = require(`../api`);
-const {testConnectionDB, db} = require(`../db-service`);
+const {authenticateDB, db} = require(`../db-service`);
 const {getLogger, logMessages} = require(`../logger`);
 
 const startRequestLogger = require(`../middlewares/startRequestLogger`);
@@ -16,12 +16,12 @@ const logger = getLogger();
 
 const createApp = async () => {
   const app = express();
-  const {dataBaseLogger} = testConnectionDB;
+  const {dataBaseLogger} = authenticateDB;
 
   try {
     dataBaseLogger.start();
 
-    await testConnectionDB.run();
+    await authenticateDB.run();
     dataBaseLogger.end();
   } catch (error) {
     dataBaseLogger.error(error);
