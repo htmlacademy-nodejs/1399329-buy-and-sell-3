@@ -14,10 +14,16 @@ const logger = getLogger({
 const sequelize = new Sequelize(db.DB_NAME, db.DB_USER, db.DB_PASSWORD, {
   host: db.DB_HOST,
   dialect: db.DB_DIALECT,
+  pool: {
+    max: 5,
+    min: 0,
+    acquire: 10000,
+    idle: 10000,
+  },
   // logging: msg => logger.debug(msg) // add custom logger?
 });
 
-const testConnectionDB = {
+const authenticateDB = {
   run: async () => sequelize.authenticate(),
   dataBaseLogger: {
     start: () => logger.info(logMessages.getStartConnectDB()),
@@ -43,7 +49,7 @@ const initDb = async () => {
 
 module.exports = {
   sequelize,
-  testConnectionDB,
+  authenticateDB,
   db: models,
   initDb,
 };
